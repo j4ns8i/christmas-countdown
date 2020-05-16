@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from flask import Flask
 app = Flask('christmas-countdown')
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def christmas_countdown_handler():
     now = datetime.now()
     christmas = get_next_christmas(now)
