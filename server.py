@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 from typing import List
 
 from dateutil.relativedelta import relativedelta
@@ -64,4 +65,4 @@ def human_readable_timedelta(christmas: datetime, d: datetime) -> str:
         return ", ".join(truncated_components)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=os.getenv("PORT", 8000))

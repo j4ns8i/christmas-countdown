@@ -1,1 +1,1 @@
-web: FLASK_APP=server.py FLASK_RUN_PORT=$PORT python server.py
+web: python server.py
