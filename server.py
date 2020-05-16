@@ -62,3 +62,6 @@ def human_readable_timedelta(christmas: datetime, d: datetime) -> str:
     elif len(truncated_components) > 2:
         truncated_components[-1] = "and " + truncated_components[-1]
         return ", ".join(truncated_components)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
