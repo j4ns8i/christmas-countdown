@@ -1,1 +1,1 @@
-web: FLASK_APP=server.py pipenv run python -m flask run
+web: FLASK_APP=server.py python -m flask run
