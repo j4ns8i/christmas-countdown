@@ -1,20 +1,38 @@
-use chrono::{Datelike, Duration};
-use chrono_tz;
+use chrono::{DateTime, Datelike, Duration, TimeZone, Utc};
+use chrono_tz::{America::Los_Angeles, Tz};
 use rocket;
 
 #[rocket::get("/")]
 fn index() -> String {
-    let tz = chrono_tz::America::Los_Angeles;
-    let now = chrono::Utc::now().with_timezone(&tz);
-    let christmas_date = chrono::NaiveDate::from_ymd_opt(now.year(), 12, 25).unwrap();
-    if now.date_naive() == christmas_date {
+    let tz = Los_Angeles;
+    let now = Utc::now().with_timezone(&tz);
+    let next_christmas_date = find_next_christmas_date(&now);
+    if now.date_naive() == next_christmas_date.date_naive() {
         "Merry christmas!".into()
     } else {
-        "TODO".into()
+        format!(
+            "Only {} until Christmas!",
+            duration_string(next_christmas_date - now)
+        )
     }
 }
 
-fn duration_string(mut dur: chrono::Duration) -> String {
+fn find_next_christmas_date(date: &DateTime<Tz>) -> DateTime<Tz> {
+    let christmas_current_year = date
+        .timezone()
+        .with_ymd_and_hms(date.year(), 12, 25, 0, 0, 0)
+        .unwrap();
+    let delta = christmas_current_year.date_naive() - date.date_naive();
+    if delta >= Duration::zero() {
+        christmas_current_year
+    } else {
+        date.timezone()
+            .with_ymd_and_hms(date.year() + 1, 12, 25, 0, 0, 0)
+            .unwrap()
+    }
+}
+
+fn duration_string(mut dur: Duration) -> String {
     let days = dur.num_days();
     dur = dur - Duration::days(days);
     let hours = dur.num_hours();
@@ -103,5 +121,35 @@ mod tests {
         assert_eq!(pluralize("day", 10), "days");
         assert_eq!(pluralize("month", 1), "month");
         assert_eq!(pluralize("test", 5), "tests");
+    }
+
+    #[test]
+    fn test_find_next_christmas_date() {
+        assert_eq!(
+            find_next_christmas_date(
+                &Los_Angeles
+                    .with_ymd_and_hms(2022, 12, 20, 16, 30, 15)
+                    .unwrap()
+            ),
+            Los_Angeles.with_ymd_and_hms(2022, 12, 25, 0, 0, 0).unwrap(),
+        );
+
+        assert_eq!(
+            find_next_christmas_date(
+                &Los_Angeles
+                    .with_ymd_and_hms(2020, 12, 30, 16, 30, 15)
+                    .unwrap()
+            ),
+            Los_Angeles.with_ymd_and_hms(2021, 12, 25, 0, 0, 0).unwrap(),
+        );
+
+        assert_eq!(
+            find_next_christmas_date(
+                &Los_Angeles
+                    .with_ymd_and_hms(2020, 12, 25, 16, 30, 15)
+                    .unwrap()
+            ),
+            Los_Angeles.with_ymd_and_hms(2020, 12, 25, 0, 0, 0).unwrap(),
+        );
     }
 }
