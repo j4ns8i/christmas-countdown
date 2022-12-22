@@ -4,8 +4,7 @@ use rocket;
 
 #[rocket::get("/")]
 fn index() -> String {
-    let tz = Los_Angeles;
-    let now = Utc::now().with_timezone(&tz);
+    let now = Utc::now().with_timezone(&Los_Angeles);
     let next_christmas_date = find_next_christmas_date(&now);
     if now.date_naive() == next_christmas_date.date_naive() {
         "Merry christmas!".into()
