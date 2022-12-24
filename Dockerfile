@@ -6,7 +6,7 @@ ARG CC_CARGO_BUILD_FLAGS=""
 ARG CC_CARGO_INSTALL_FLAGS="--debug"
 
 WORKDIR /usr/src
-RUN rustup target add x86_64-unknown-linux-musl
+RUN rustup target add x86_64-unknown-linux-gnu
 
 RUN cargo new christmas-countdown
 WORKDIR /usr/src/christmas-countdown
@@ -16,9 +16,9 @@ RUN --mount=type=cache,target=./target \
 
 COPY src ./src
 RUN --mount=type=cache,target=./target \
-    cargo install $CC_CARGO_INSTALL_FLAGS --target x86_64-unknown-linux-musl --path .
+    cargo install $CC_CARGO_INSTALL_FLAGS --target x86_64-unknown-linux-gnu --path .
 
-FROM alpine:latest
+FROM debian:11.6-slim
 COPY --from=builder /usr/local/cargo/bin/christmas-countdown /usr/local/bin/christmas-countdown
 ENV ROCKET_ADDRESS=0.0.0.0
 ENV ROCKET_PORT=8080
