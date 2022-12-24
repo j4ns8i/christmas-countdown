@@ -8,4 +8,8 @@ edition = "2021"
 [dependencies]
 chrono = "0.4.23"
 chrono-tz = "0.8.1"
-rocket = "0.5.0-rc"
+env_logger = "0.10.0"
+log = "0.4.17"
+rocket = { version = "0.5.0-rc", features = ["serde_json", "json"] }
+serde = "1.0.151"
+url = "2.3.1"

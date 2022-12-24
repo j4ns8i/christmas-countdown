@@ -1,19 +1,40 @@
 use chrono::{DateTime, Datelike, Duration, TimeZone, Utc};
 use chrono_tz::{America::Los_Angeles, Tz};
-use rocket;
+use rocket::serde::json::Json;
+use serde::Serialize;
 
-#[rocket::get("/")]
-fn index() -> String {
-    let tz = Los_Angeles;
-    let now = Utc::now().with_timezone(&tz);
+#[derive(Serialize)]
+struct Response {
+    text: String,
+    response_type: &'static str,
+}
+
+const RESPONSE_TYPE_IN_CHANNEL: &'static str = "in_channel";
+
+#[rocket::get("/health")]
+fn health() -> String {
+    "".into()
+}
+
+#[rocket::post("/countdown")]
+fn index() -> Json<Response> {
+    let now = Utc::now().with_timezone(&Los_Angeles);
     let next_christmas_date = find_next_christmas_date(&now);
     if now.date_naive() == next_christmas_date.date_naive() {
-        "Merry christmas!".into()
+        let text = String::from("Merry Christmas to all! :wreath: :color-lights: :christmas_tree:");
+        Json(Response {
+            text,
+            response_type: RESPONSE_TYPE_IN_CHANNEL,
+        })
     } else {
-        format!(
-            "Only {} until Christmas!",
+        let text = format!(
+            "Only {} until Christmas! :wreath: :color-lights: :christmas_tree:",
             duration_string(next_christmas_date - now)
-        )
+        );
+        Json(Response {
+            text,
+            response_type: RESPONSE_TYPE_IN_CHANNEL,
+        })
     }
 }
 
@@ -63,7 +84,10 @@ fn pluralize(unit: impl AsRef<str>, num: i64) -> String {
 
 #[rocket::launch]
 fn server() -> _ {
-    rocket::build().mount("/", rocket::routes![index])
+    env_logger::builder()
+        .filter_level(log::LevelFilter::Info)
+        .init();
+    rocket::build().mount("/", rocket::routes![index, health])
 }
 
 #[cfg(test)]

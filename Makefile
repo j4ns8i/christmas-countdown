@@ -23,10 +23,10 @@ docker-build:
 
 .PHONY: docker-push
 docker-push: docker-build
-	# docker push $(IMAGE_TAG_RELEASE)
+	docker push $(IMAGE_TAG_RELEASE)
+	docker push $(IMAGE_TAG_LATEST_RELEASE)
 	# docker push $(IMAGE_TAG_DEBUG)
-	# docker push $(IMAGE_TAG_LATEST_RELEASE)
-	docker push $(IMAGE_TAG_LATEST_DEBUG)
+	# docker push $(IMAGE_TAG_LATEST_DEBUG)
 
 .PHONY: dev-up
 dev-up: docker-build
